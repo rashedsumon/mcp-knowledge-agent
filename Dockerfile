@@ -1,5 +1,6 @@
-# Use a highly stable Python slim image to ensure 100% compatibility
-FROM python:3.11-slim
+# Switch to the full official Python image. 
+# This image already contains build-essential, curl, and git pre-installed.
+FROM python:3.11
 
 # Set system environment optimizations
 ENV PYTHONUNBUFFERED=1 \
@@ -9,17 +10,12 @@ ENV PYTHONUNBUFFERED=1 \
 # Set the working directory inside the container
 WORKDIR /app
 
-# REMOVED software-properties-common to fix the Debian build crash
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# No apt-get commands needed here anymore! This prevents the status 100 error entirely.
 
 # Copy requirements first to leverage Docker's layer caching mechanism
 COPY requirements.txt .
 
-# Upgrade pip and install dependencies cleanly
+# Upgrade pip and install your dependencies cleanly
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 

@@ -1,0 +1,16 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment and Data
+.env
+.venv
+env/
+venv/
+data/
+model_output/
+checkpoint-*/
+
+# Streamlit logs
+.streamlit/

@@ -1,0 +1,11 @@
+streamlit
+crewai
+mcp
+fastmcp
+transformers
+datasets
+accelerate
+torch
+sentence-transformers
+faiss-cpu
+pydantic

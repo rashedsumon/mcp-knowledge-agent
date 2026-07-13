@@ -1,23 +1,28 @@
-# --- CRITICAL PYDANTIC v1 / PYTHON 3.14 COMPATIBILITY PATCH ---
+# ==============================================================================
+# 🚨 CRITICAL BLANKET PYDANTIC V1 / PYTHON 3.14 COMPATIBILITY PATCH 🚨
+# This MUST stay at the absolute top of the file before any other imports occur!
+# ==============================================================================
 import sys
+from typing import Any
 import pydantic.v1.fields
 
-# Save the original method
+# Save the original Pydantic type inference method
 original_set_default_and_type = pydantic.v1.fields.ModelField._set_default_and_type
 
 def patched_set_default_and_type(self):
     try:
         original_set_default_and_type(self)
-    except Exception as e:
-        # Fallback for chroma_server_nofile type inference bug under Python 3.14
-        if getattr(self, 'name', '') == 'chroma_server_nofile':
-            self.type_ = bool
-            self.outer_type_ = bool
-        else:
-            raise e
+    except Exception:
+        # Catch ALL type inference failures caused by Python 3.14's type engine changes.
+        # Force the field to accept 'Any' type to prevent the application from crashing.
+        self.type_ = Any
+        self.outer_type_ = Any
+        self.key_type_ = None
+        self.sub_fields = None
 
+# Apply the global bypass injection
 pydantic.v1.fields.ModelField._set_default_and_type = patched_set_default_and_type
-# --- END PATCH ---
+# ==============================================================================
 
 import streamlit as st
 from agents import ResearchAgentGroup
@@ -48,7 +53,7 @@ for chat in st.session_state.chat_history:
     with st.chat_message(chat["role"]):
         st.markdown(chat["content"])
 
-# Process input prompts dynamically matching Scenario 1 & 2
+# Process input prompts dynamically matching Scenarios 
 if user_prompt := st.chat_input("Ask a question regarding internal records..."):
     with st.chat_message("user"):
         st.markdown(user_prompt)
@@ -65,7 +70,6 @@ if user_prompt := st.chat_input("Ask a question regarding internal records..."):
                     user_question=user_prompt, 
                     context_history=history_string
                 )
-                # Fallback format checking for the user interface display safety
                 response_text = str(response)
                 st.markdown(response_text)
                 st.session_state.chat_history.append({"role": "assistant", "content": response_text})

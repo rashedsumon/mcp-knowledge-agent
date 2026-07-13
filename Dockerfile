@@ -1,6 +1,6 @@
 # Switch to the full official Python image. 
 # This image already contains build-essential, curl, and git pre-installed.
-FROM python:3.11
+FROM python
 
 # Set system environment optimizations
 ENV PYTHONUNBUFFERED=1 \

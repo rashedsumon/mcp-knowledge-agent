@@ -1,3 +1,24 @@
+# --- CRITICAL PYDANTIC v1 / PYTHON 3.14 COMPATIBILITY PATCH ---
+import sys
+import pydantic.v1.fields
+
+# Save the original method
+original_set_default_and_type = pydantic.v1.fields.ModelField._set_default_and_type
+
+def patched_set_default_and_type(self):
+    try:
+        original_set_default_and_type(self)
+    except Exception as e:
+        # Fallback for chroma_server_nofile type inference bug under Python 3.14
+        if getattr(self, 'name', '') == 'chroma_server_nofile':
+            self.type_ = bool
+            self.outer_type_ = bool
+        else:
+            raise e
+
+pydantic.v1.fields.ModelField._set_default_and_type = patched_set_default_and_type
+# --- END PATCH ---
+
 import streamlit as st
 from agents import ResearchAgentGroup
 from data_loader import KnowledgeDataLoader

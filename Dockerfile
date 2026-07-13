@@ -1,5 +1,4 @@
-# Use an explicit, highly stable Python slim image to ensure 
-# 100% compatibility with CrewAI, Pydantic v1, and ChromaDB.
+# Use a highly stable Python slim image to ensure 100% compatibility
 FROM python:3.11-slim
 
 # Set system environment optimizations
@@ -10,11 +9,10 @@ ENV PYTHONUNBUFFERED=1 \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Install system dependencies required for compiling heavy Python binaries (like FAISS or Torch)
+# REMOVED software-properties-common to fix the Debian build crash
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
-    software-properties-common \
     git \
     && rm -rf /var/lib/apt/lists/*
 
